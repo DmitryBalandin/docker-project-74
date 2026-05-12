@@ -1,5 +1,8 @@
 services:
   app:
-    build: .
-    volumes:
-      - ./app:/app
+    build:
+      context: .
+      dockerfile: Dockerfile.production
+    command: make test
+    image: balandindg/docker-project-74
+    
