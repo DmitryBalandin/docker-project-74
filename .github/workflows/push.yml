@@ -21,7 +21,7 @@ jobs:
         run: make ci
 
       - name: Build production image
-        run: docker-compose -f docker-compose.yml build app
+        run: docker compose -f docker-compose.yml build app
 
       - name: Push image to Docker Hub
-        run: docker-compose -f docker-compose.yml push app
+        run: docker compose -f docker-compose.yml push app
