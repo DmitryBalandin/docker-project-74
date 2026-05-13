@@ -1,7 +1,54 @@
 services:
   app:
-    command: make dev
+    build:
+      context: .
+      dockerfile: Dockerfile.production
     ports:
       - "8080:8080"
     volumes:
-      - ./app:/app
+      - "./app:/app"
+    environment:
+      NODE_ENV: production
+      DATABASE_HOST: db
+      DATABASE_PORT: 5432
+      DATABASE_USERNAME: blog_user
+      DATABASE_PASSWORD: blog_password
+      DATABASE_NAME: blog_development
+    depends_on:
+      db:
+        condition: service_healthy
+    stdin_open: true
+    tty: true
+
+  caddy:
+    image: caddy:2.6
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./services/caddy/Caddyfile:/etc/caddy/Caddyfile
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - app
+
+  db:
+    image: postgres:16
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: blog_user
+      POSTGRES_PASSWORD: blog_password
+      POSTGRES_DB: blog_development
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U blog_user -d blog_development"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  caddy_data:
+  caddy_config:
+  postgres_data:
