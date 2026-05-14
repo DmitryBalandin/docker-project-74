@@ -1,12 +1,18 @@
 # === Основные цели для задания ===
 .PHONY: setup test dev down build logs shell clear
 
+
+prepare-env:
+	@if [ ! -f .env ]; then \
+		cp app/.env.example .env; \
+		sed -i 's/DATABASE_HOST=localhost/DATABASE_HOST=db/' .env; \
+	fi
+
 # Установка зависимостей и миграции (вызов make setup внутри контейнера)
-setup:
+setup: prepare-env
 	docker-compose run --rm app make setup
 
-# Запуск тестов в продакшен-режиме (без override, с возвратом кода выхода)
-test:
+test: prepare-env
 	docker-compose -f docker-compose.yml up --abort-on-container-exit --exit-code-from app
 
 # Запуск приложения в режиме разработки (с override, порт 8080)
@@ -57,5 +63,5 @@ compose-restart:
 # Составная цель: пересборка и установка (если нужно)
 compose-setup: compose-down compose-build setup
 
-ci:
+ci: prepare-env
 	docker compose -f docker-compose.yml up --abort-on-container-exit --exit-code-from app
