@@ -65,3 +65,6 @@ compose-setup: compose-down compose-build setup
 
 ci: prepare-env
 	docker compose -f docker-compose.yml up --abort-on-container-exit --exit-code-from app
+
+code-setup: prepare-env
+	docker-compose run --rm app make setup
