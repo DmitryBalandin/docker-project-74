@@ -9,12 +9,7 @@ services:
     volumes:
       - "./app:/app"
     environment:
-      NODE_ENV: production
       DATABASE_HOST: db
-      DATABASE_PORT: 5432
-      DATABASE_USERNAME: blog_user
-      DATABASE_PASSWORD: blog_password
-      DATABASE_NAME: blog_development
     depends_on:
       db:
         condition: service_healthy
@@ -38,13 +33,12 @@ services:
     image: postgres:16
     restart: unless-stopped
     environment:
-      POSTGRES_USER: blog_user
-      POSTGRES_PASSWORD: blog_password
-      POSTGRES_DB: blog_development
+      POSTGRES_USER: ${DATABASE_USERNAME}     
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}  
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U blog_user -d blog_development"]
+      test: ["CMD-SHELL", "pg_isready -U ${DATABASE_USERNAME} -d ${DATABASE_NAME}"]
       interval: 5s
       timeout: 5s
       retries: 5
